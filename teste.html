@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Login</title>
+    <style>
+        :root{
+            --bg:#f2f5f9; --card:#ffffff; --accent:#0b5cff; --muted:#667085;
+        }
+        *{box-sizing:border-box}
+        html,body{height:100%}
+        body{
+            margin:0;
+            font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;
+            background:linear-gradient(180deg,#eef5ff 0%,var(--bg) 100%);
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            padding:32px;
+            color:#0b1724;
+        }
+        .card{
+            width:100%;
+            max-width:420px;
+            background:var(--card);
+            padding:28px;
+            border-radius:12px;
+            box-shadow:0 10px 30px rgba(10,20,40,0.08);
+        }
+        h1{margin:0 0 8px;font-size:20px}
+        p.lead{margin:0 0 20px;color:var(--muted);font-size:14px}
+        label{display:block;font-size:13px;margin-bottom:6px;color:#0f1724}
+        input[type="text"], input[type="email"], input[type="password"]{
+            width:100%;
+            padding:10px 12px;
+            border:1px solid #e6edf6;
+            border-radius:8px;
+            background:#fff;
+            font-size:14px;
+            color: #0b1724;
+            outline: none;
+        }
+        input:focus{border-color:var(--accent);box-shadow:0 0 0 4px rgba(11,92,255,0.06)}
+        .row{display:flex;gap:12px;align-items:center;margin-top:12px}
+        .checkbox{display:flex;gap:8px;align-items:center;font-size:13px;color:var(--muted)}
+        button{
+            background:var(--accent);
+            color:#fff;
+            border:none;
+            padding:10px 14px;
+            border-radius:8px;
+            font-size:15px;
+            cursor:pointer;
+        }
+        .muted{font-size:13px;color:var(--muted);margin-top:12px}
+        .error{color:#b00020;font-size:13px;margin-top:8px}
+        .toggle-pass{background:none;border:none;color:var(--muted);cursor:pointer;padding:6px;font-size:13px}
+        .footer{margin-top:18px;text-align:center;font-size:13px;color:var(--muted)}
+        @media (max-width:420px){body{padding:16px}.card{padding:18px}}
+    </style>
+</head>
+<body>
+    <main class="card" role="main" aria-labelledby="loginTitle">
+        <h1 id="loginTitle">Entrar</h1>
+        <p class="lead">Insira suas credenciais para acessar o sistema.</p>
+
+        <form id="loginForm" novalidate>
+            <div>
+                <label for="user">E-mail ou usuário</label>
+                <input id="user" name="user" type="text" inputmode="email" autocomplete="username" required placeholder="seu@exemplo.com ou usuário">
+                <div id="userError" class="error" aria-live="polite" hidden></div>
+            </div>
+
+            <div style="margin-top:12px">
+                <label for="password">Senha</label>
+                <div style="display:flex;gap:8px">
+                    <input id="password" name="password" type="password" autocomplete="current-password" required placeholder="••••••••">
+                    <button type="button" class="toggle-pass" id="togglePass" aria-pressed="false" aria-label="Mostrar senha">Mostrar</button>
+                </div>
+                <div id="passError" class="error" aria-live="polite" hidden></div>
+            </div>
+
+            <div class="row" style="margin-top:18px;justify-content:space-between;">
+                <label class="checkbox"><input id="remember" name="remember" type="checkbox"> Lembrar-me</label>
+                <a href="#" style="font-size:13px;color:var(--accent);text-decoration:none">Esqueci a senha</a>
+            </div>
+
+            <div style="margin-top:18px;display:flex;gap:10px;align-items:center;justify-content:space-between">
+                <button type="submit">Entrar</button>
+                <div id="status" class="muted" aria-live="polite"></div>
+            </div>
+        </form>
+
+        <div class="footer">Ainda não tem conta? <a href="#" style="color:var(--accent);text-decoration:none">Criar conta</a></div>
+    </main>
+
+    <script>
+        const form = document.getElementById('loginForm');
+        const user = document.getElementById('user');
+        const pass = document.getElementById('password');
+        const userError = document.getElementById('userError');
+        const passError = document.getElementById('passError');
+        const status = document.getElementById('status');
+        const toggle = document.getElementById('togglePass');
+
+        toggle.addEventListener('click', () => {
+            const showing = pass.type === 'text';
+            pass.type = showing ? 'password' : 'text';
+            toggle.textContent = showing ? 'Mostrar' : 'Ocultar';
+            toggle.setAttribute('aria-pressed', String(!showing));
+        });
+
+        function validate() {
+            let ok = true;
+            userError.hidden = true;
+            passError.hidden = true;
+            status.textContent = '';
+
+            if (!user.value.trim()) {
+                userError.textContent = 'Informe seu e-mail ou usuário.';
+                userError.hidden = false;
+                ok = false;
+            } else if (user.value.includes('@')) {
+                // simple email format check
+                const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!re.test(user.value.trim())) {
+                    userError.textContent = 'E-mail inválido.';
+                    userError.hidden = false;
+                    ok = false;
+                }
+            }
+
+            if (!pass.value || pass.value.length < 6) {
+                passError.textContent = 'A senha deve ter ao menos 6 caracteres.';
+                passError.hidden = false;
+                ok = false;
+            }
+
+            return ok;
+        }
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            if (!validate()) return;
+
+            // Simulação de envio — substituir por chamada real ao servidor.
+            status.textContent = 'Validando...';
+            const submitBtn = form.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+
+            setTimeout(() => {
+                submitBtn.disabled = false;
+                // Exemplo: sucesso se usuário for "admin" e senha "senha123", senão erro.
+                if ((user.value.trim().toLowerCase() === 'admin' && pass.value === 'senha123') || user.value.includes('@')) {
+                    status.textContent = 'Login bem-sucedido.';
+                    // redirecionar ou executar ação aqui
+                } else {
+                    status.textContent = '';
+                    passError.textContent = 'Usuário ou senha incorretos.';
+                    passError.hidden = false;
+                }
+            }, 900);
+        });
+    </script>
+</body>
+</html>
